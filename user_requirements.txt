@@ -1,5 +1,0 @@
-User confirmation:
-- Frontend: React (Vite)
-- Backend: Node.js (Express)
-- CSS: Tailwind CSS
-- Theme: Cool futuristic Hextech theme (Blue and Gold colors)
