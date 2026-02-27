@@ -1,0 +1,12 @@
+User confirmation:
+- Frontend: React (Vite)
+- Backend: Node.js (Express)
+- CSS: Tailwind CSS
+- Database: MongoDB (Mongoose)
+- Theme: Neon Green Hacker
+- Model: Project (title, description, author)
+- Feature 1: User Model (username, password)
+- Feature 2: Auth Routes (Login/Register)
+- Feature 3: Project Routes (Public GET, Protected POST/DELETE)
+- Feature 4: Interactive CLI (help, list, clear, status)
+- Feature 5: Real-time Activity Feed (Socket.io)

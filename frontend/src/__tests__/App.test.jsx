@@ -2,26 +2,42 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import App from '../App'
 
-// Mock global fetch
-global.fetch = vi.fn()
-
 describe('App Component', () => {
   beforeEach(() => {
-    fetch.mockClear()
+    vi.clearAllMocks()
+    // Default mock for any fetch call
+    fetch.mockImplementation((url) => {
+      if (url.includes('/API/health')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ status: 'active', database: 'connected' })
+        })
+      }
+      if (url.includes('/api/projects')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ([])
+        })
+      }
+      return Promise.reject(new Error('Unknown URL'))
+    })
   })
 
-  it('renders with initial OFFLINE status', () => {
-    fetch.mockImplementationOnce(() => new Promise(() => {})) // Never resolves
+  it('renders with initial OFFLINE status', async () => {
+    // Override health check to stay pending
+    fetch.mockImplementation((url) => {
+        if (url.includes('/API/health')) {
+            return new Promise(() => {})
+        }
+        return Promise.resolve({ ok: true, json: async () => [] })
+    })
+
     render(<App />)
     expect(screen.getByText('OFFLINE')).toBeInTheDocument()
     expect(screen.getByText('UNKNOWN')).toBeInTheDocument()
   })
 
   it('updates status when API succeeds', async () => {
-    fetch.mockResolvedValueOnce({
-      json: async () => ({ status: 'active', database: 'connected' }),
-    })
-
     render(<App />)
 
     await waitFor(() => {
@@ -31,7 +47,12 @@ describe('App Component', () => {
   })
 
   it('shows error when API fails', async () => {
-    fetch.mockRejectedValueOnce(new Error('Network failure'))
+    fetch.mockImplementation((url) => {
+      if (url.includes('/API/health')) {
+        return Promise.reject(new Error('Network failure'))
+      }
+      return Promise.resolve({ ok: true, json: async () => [] })
+    })
 
     render(<App />)
 
