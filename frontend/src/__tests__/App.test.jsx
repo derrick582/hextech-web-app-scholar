@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import App from '../App'
 
@@ -32,13 +32,18 @@ describe('App Component', () => {
         return Promise.resolve({ ok: true, json: async () => [] })
     })
 
-    render(<App />)
+    await act(async () => {
+      render(<App />)
+    })
+
     expect(screen.getByText('OFFLINE')).toBeInTheDocument()
     expect(screen.getByText('UNKNOWN')).toBeInTheDocument()
   })
 
   it('updates status when API succeeds', async () => {
-    render(<App />)
+    await act(async () => {
+      render(<App />)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('ACTIVE')).toBeInTheDocument()
@@ -54,7 +59,9 @@ describe('App Component', () => {
       return Promise.resolve({ ok: true, json: async () => [] })
     })
 
-    render(<App />)
+    await act(async () => {
+      render(<App />)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('CONNECTION_ERROR')).toBeInTheDocument()

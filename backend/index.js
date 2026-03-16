@@ -8,22 +8,40 @@ const connectDB = require('./config/db');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST", "DELETE"]
-  }
-});
 
 const PORT = process.env.PORT || 5000;
 
 // Connect to Database
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'demo') {
   connectDB();
 }
 
-app.use(cors());
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:5173', 'http://localhost:3000'];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
+
+const io = socketIo(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "DELETE"]
+  }
+});
 
 // Set socket.io to app to use in routes
 app.set('io', io);

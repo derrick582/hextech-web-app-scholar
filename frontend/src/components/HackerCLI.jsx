@@ -31,7 +31,8 @@ const HackerCLI = () => {
       case 'list':
         newHistory.push({ type: 'info', text: 'QUERYING REPOSITORY...' });
         try {
-          const res = await fetch('http://localhost:5000/api/projects');
+          const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+          const res = await fetch(`${apiUrl}/api/projects`);
           const data = await res.json();
           if (data.length === 0) {
             newHistory.push({ type: 'info', text: 'NO RECORDS FOUND.' });

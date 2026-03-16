@@ -15,7 +15,8 @@ function AppContent() {
 
   useEffect(() => {
     const checkHealth = () => {
-      fetch('http://localhost:5000/API/health')
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      fetch(`${apiUrl}/API/health`)
         .then(res => res.json())
         .then(data => {
           setStatus(data.status.toUpperCase())

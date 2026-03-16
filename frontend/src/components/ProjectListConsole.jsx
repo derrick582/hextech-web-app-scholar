@@ -9,7 +9,8 @@ const ProjectListConsole = () => {
 
   const fetchProjects = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/projects');
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/projects`);
       const data = await res.json();
       setProjects(data);
       setLoading(false);
@@ -22,7 +23,8 @@ const ProjectListConsole = () => {
   useEffect(() => {
     fetchProjects();
 
-    const socket = io('http://localhost:5000');
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const socket = io(apiUrl);
     socket.on('project_created', () => fetchProjects());
     socket.on('project_deleted', () => fetchProjects());
 
@@ -33,7 +35,8 @@ const ProjectListConsole = () => {
     if (!window.confirm('[!] CONFIRM PURGE SEQUENCE?')) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/projects/${id}`, {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/projects/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
